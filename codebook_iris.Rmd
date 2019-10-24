@@ -1,0 +1,94 @@
+---
+title: "Codebook"
+date: "Created: `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+
+library(dplyr)
+library(knitr)
+library(kableExtra)
+```
+
+```{r, echo = F}
+# test dataset
+
+library(datasets)
+data(iris)
+
+#################################################################################
+
+create_codebook <- function(df) {
+  
+  # vector of variable names
+  variable_names <- data.frame(names(df))
+  
+  
+  # all possible values
+  result <- vector("list", length(names(df)))
+  
+  for (i in 1:length(names(df))){
+    
+     if (data.class(df[[i]]) == "numeric"){
+       result[[i]] <- (paste("range:", min(df[[i]])," - " , max(df[[i]])))
+    }
+    else{
+      result[[i]] <- (paste(unlist(unique(sort(df[[i]]))), collapse="; "))
+    }
+    
+  }
+  
+  values <- data.frame(matrix(unlist(result), nrow=length(result), byrow=T))
+  
+  
+  # data types
+  variable_types <- vector("list", length(names(df)))
+  
+  for (i in 1:length(names(df))){
+    
+    variable_types[[i]] <- (data.class(df[[i]]))
+    
+  }
+  
+  variable_types <- data.frame(matrix(unlist(variable_types)))
+  
+  # count missing
+  missing <- sapply(df, function(x) sum(is.na(x)))
+  
+  # count unique
+  unique_n <- vector("list", length(names(df)))
+  
+  for (i in 1:length(names(df))){
+    
+    if (data.class(df[[i]]) == "numeric"){
+      unique_n[[i]] <- (paste(" "))
+    }
+    else{
+      unique_n[[i]] <- (length(unique(df[[i]])))
+    }
+    
+  }
+
+  count_unique <- data.frame(matrix(unlist(unique_n)))
+  
+  
+  # bind them together
+  df_codebook <- cbind(variable_names, variable_types, values, missing, count_unique)
+  
+  # name them
+  colnames(df_codebook) <- c("variable names", "data type", "values", "n missing", "n unique")
+  
+  cat("Codebook created from dataset:", substitute(df))
+  
+  kable(df_codebook, row.names = F, digits = 4, format = "pandoc", booktabs = F) 
+  
+}
+```
+
+```{r}
+create_codebook(iris) 
+```
