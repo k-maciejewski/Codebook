@@ -12,15 +12,12 @@ knitr::opts_chunk$set(echo = F)
 library(dplyr)
 library(knitr)
 library(kableExtra)
+library(datasets)
+library(readr)
+library(readxl)
 ```
 
 ```{r, echo = F}
-# test dataset
-
-library(datasets)
-data(iris)
-
-#################################################################################
 
 create_codebook <- function(df) {
   
@@ -34,7 +31,7 @@ create_codebook <- function(df) {
   for (i in 1:length(names(df))){
     
      if (data.class(df[[i]]) == "numeric"){
-       result[[i]] <- (paste("range:", min(df[[i]])," - " , max(df[[i]])))
+       result[[i]] <- (paste("range:", min(df[[i]], na.rm = T)," - " , max(df[[i]], na.rm = T)))
     }
     else{
       result[[i]] <- (paste(unlist(unique(sort(df[[i]]))), collapse="; "))
@@ -90,5 +87,7 @@ create_codebook <- function(df) {
 ```
 
 ```{r}
-create_codebook(iris) 
+# import data and run funtion
+data <- data(iris)
+create_codebook(data) 
 ```
